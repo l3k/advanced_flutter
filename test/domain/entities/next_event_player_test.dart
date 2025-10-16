@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-class NextEventPlayerTest {
+class NextEventPlayer {
   final String id;
   final String name;
   final String? photo;
@@ -8,7 +8,7 @@ class NextEventPlayerTest {
   final bool isComfirmed;
   final DateTime? confirmationDate;
 
-  NextEventPlayerTest({
+  NextEventPlayer({
     required this.id,
     required this.name,
     required this.isComfirmed,
@@ -26,28 +26,13 @@ class NextEventPlayerTest {
 }
 
 void main() {
+  NextEventPlayer makeSut(String name) =>
+      NextEventPlayer(id: '', name: name, isComfirmed: true);
   test('should return the first letter of the first and last name', () {
-    final player = NextEventPlayerTest(
-      id: '',
-      name: 'John Doe',
-      isComfirmed: true,
-    );
-    expect(player.getInitials(), 'JD');
+    expect(makeSut('John Doe').getInitials(), 'JD');
 
-    final player2 = NextEventPlayerTest(
-      id: '',
-      name: 'Jane Smith',
-      isComfirmed: true,
-    );
+    expect(makeSut('Jane Smith').getInitials(), 'JS');
 
-    expect(player2.getInitials(), 'JS');
-
-    final player3 = NextEventPlayerTest(
-      id: '',
-      name: 'Jack Daniels Jr',
-      isComfirmed: true,
-    );
-
-    expect(player3.getInitials(), 'JJ');
+    expect(makeSut('Jack Daniels Jr').getInitials(), 'JJ');
   });
 }
