@@ -19,7 +19,9 @@ class NextEventPlayerTest {
 
   String getInitials() {
     final names = name.split(' ');
-    return '${names[0][0]}${names[1][0]}';
+    final firstChar = names.first[0];
+    final lastChar = names.last[0];
+    return '$firstChar$lastChar'.toUpperCase();
   }
 }
 
@@ -39,5 +41,13 @@ void main() {
     );
 
     expect(player2.getInitials(), 'JS');
+
+    final player3 = NextEventPlayerTest(
+      id: '',
+      name: 'Jack Daniels Jr',
+      isComfirmed: true,
+    );
+
+    expect(player3.getInitials(), 'JJ');
   });
 }
