@@ -56,5 +56,27 @@ void main() {
 
   test('should return the first letters of the first name', () {
     expect(initialsOf('John'), 'JO');
+    expect(initialsOf('J'), 'J');
+  });
+
+  test('should return "-" when name is empty', () {
+    expect(initialsOf(''), '-');
+  });
+
+  test('should convert to uppercase', () {
+    expect(initialsOf('john doe'), 'JO');
+    expect(initialsOf('john'), 'JO');
+    expect(initialsOf('j'), 'J');
+  });
+
+  test('should ignore extra whitespaces', () {
+    expect(initialsOf('John Doe '), 'JD');
+    expect(initialsOf(' John Doe'), 'JD');
+    expect(initialsOf('John  Doe'), 'JD');
+    expect(initialsOf(' John  Doe '), 'JD');
+    expect(initialsOf(' John '), 'JO');
+    expect(initialsOf(' J '), 'J');
+    expect(initialsOf(' '), '-');
+    expect(initialsOf('  '), '-');
   });
 }
