@@ -48,11 +48,13 @@ class NextEventPlayer {
 void main() {
   String initialsOf(String name) =>
       NextEventPlayer(id: '', name: name, isConfirmed: true).initials;
-  test('should return the first letter of the first and last name', () {
+  test('should return the first letter of the first and last names', () {
     expect(initialsOf('John Doe'), 'JD');
-
     expect(initialsOf('Jane Smith'), 'JS');
-
     expect(initialsOf('Jack Daniels Jr'), 'JJ');
+  });
+
+  test('should return the first letters of the first name', () {
+    expect(initialsOf('John'), 'JO');
   });
 }
