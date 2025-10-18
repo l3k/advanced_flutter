@@ -20,7 +20,7 @@ void main() {
   });
 
   test('should convert to uppercase', () {
-    expect(initialsOf('john doe'), 'JO');
+    expect(initialsOf('john doe'), 'JD');
     expect(initialsOf('john'), 'JO');
     expect(initialsOf('j'), 'J');
   });
