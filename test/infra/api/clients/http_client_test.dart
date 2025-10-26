@@ -12,21 +12,31 @@ class HttpClient {
     required String url,
     Map<String, String>? headers,
     Map<String, String?>? params,
+    Map<String, String>? queryString,
   }) async {
     final allHeaders = (headers ?? {})
       ..addAll({
         'content-type': 'application/json',
         'accept': 'application/json',
       });
-    final uri = _buildUri(url: url, params: params);
+    final uri = _buildUri(url: url, params: params, queryString: queryString);
     await client.get(uri, headers: allHeaders);
   }
 
-  Uri _buildUri({required String url, Map<String, String?>? params}) {
+  Uri _buildUri({
+    required String url,
+    Map<String, String?>? params,
+    Map<String, String>? queryString,
+  }) {
     params?.forEach(
       (key, value) => url = url.replaceFirst(':$key', value ?? ''),
     );
     if (url.endsWith('/')) url = url.substring(0, url.length - 1);
+    if (queryString != null) {
+      url += '?';
+      queryString.forEach((key, value) => url += '$key=$value&');
+      url = url.substring(0, url.length - 1);
+    }
     return Uri.parse(url);
   }
 }
@@ -89,6 +99,14 @@ void main() {
       url = 'http://anyurl.com/:param1/:param2';
       await sut.get(url: url, params: {'param3': 'value3'});
       expect(client.url, 'http://anyurl.com/:param1/:param2');
+    });
+
+    test('should request with correct queryStrings', () async {
+      await sut.get(
+        url: url,
+        queryString: {'query1': 'value1', 'query2': 'value2'},
+      );
+      expect(client.url, '$url?query1=value1&query2=value2');
     });
   });
 }
