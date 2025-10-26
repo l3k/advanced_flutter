@@ -11,7 +11,7 @@ class HttpClient {
   Future<void> get({
     required String url,
     Map<String, String>? headers,
-    Map<String, String>? params,
+    Map<String, String?>? params,
   }) async {
     final allHeaders = (headers ?? {})
       ..addAll({
@@ -22,8 +22,11 @@ class HttpClient {
     await client.get(uri, headers: allHeaders);
   }
 
-  Uri _buildUri({required String url, Map<String, String>? params}) {
-    params?.forEach((key, value) => url = url.replaceFirst(':$key', value));
+  Uri _buildUri({required String url, Map<String, String?>? params}) {
+    params?.forEach(
+      (key, value) => url = url.replaceFirst(':$key', value ?? ''),
+    );
+    if (url.endsWith('/')) url = url.substring(0, url.length - 1);
     return Uri.parse(url);
   }
 }
@@ -74,6 +77,12 @@ void main() {
       url = 'http://anyurl.com/:param1/:param2';
       await sut.get(url: url, params: {'param1': 'value1', 'param2': 'value2'});
       expect(client.url, 'http://anyurl.com/value1/value2');
+    });
+
+    test('should request with optional param', () async {
+      url = 'http://anyurl.com/:param1/:param2';
+      await sut.get(url: url, params: {'param1': 'value1', 'param2': null});
+      expect(client.url, 'http://anyurl.com/value1');
     });
   });
 }
