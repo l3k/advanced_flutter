@@ -108,5 +108,18 @@ void main() {
       );
       expect(client.url, '$url?query1=value1&query2=value2');
     });
+
+    test('should request with correct queryStrings and params', () async {
+      url = 'http://anyurl.com/:param3/:param4';
+      await sut.get(
+        url: url,
+        queryString: {'query1': 'value1', 'query2': 'value2'},
+        params: {'param3': 'value3', 'param4': 'value4'},
+      );
+      expect(
+        client.url,
+        'http://anyurl.com/value3/value4?query1=value1&query2=value2',
+      );
+    });
   });
 }
