@@ -1,13 +1,15 @@
 import 'dart:convert';
 
 import 'package:advanced_flutter/domain/entites/domain_error.dart';
+import 'package:advanced_flutter/infra/api/clients/http_get_client.dart';
 import 'package:dartx/dartx.dart';
 import 'package:http/http.dart';
 
-class HttpAdapter {
+class HttpAdapter implements HttpGetClient {
   final Client client;
   HttpAdapter({required this.client});
 
+  @override
   Future<dynamic> get({
     required String url,
     Map<String, String>? headers,
