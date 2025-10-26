@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:advanced_flutter/domain/entites/domain_error.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +12,7 @@ class HttpClient {
   final Client client;
   HttpClient({required this.client});
 
-  Future<void> get({
+  Future<dynamic> get({
     required String url,
     Map<String, String>? headers,
     Map<String, String?>? params,
@@ -25,7 +27,12 @@ class HttpClient {
     final response = await client.get(uri, headers: allHeaders);
     switch (response.statusCode) {
       case 200:
-        break;
+        {
+          if (response.body.isEmpty) return null;
+          return jsonDecode(response.body);
+        }
+      case 204:
+        return null;
       case 401:
         throw DomainError.sessionExpired;
       default:
@@ -62,8 +69,14 @@ void main() {
 
   setUp(() {
     client = ClientSpy();
-    sut = HttpClient(client: client);
+    client.responseJson = '''
+      {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    ''';
     url = anyString();
+    sut = HttpClient(client: client);
   });
   group('get', () {
     test('should request with correct method', () async {
@@ -164,6 +177,54 @@ void main() {
       client.simulateServerError();
       final future = sut.get(url: url);
       expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should return a Map', () async {
+      final data = await sut.get(url: url);
+      expect(data?['key1'], 'value1');
+      expect(data?['key2'], 'value2');
+    });
+
+    test('should return a List', () async {
+      client.responseJson = '''
+        [{
+          "key": "value1"
+        }, {
+          "key": "value2"
+        }]
+      ''';
+      final data = await sut.get(url: url);
+      expect(data?[0]['key'], 'value1');
+      expect(data?[1]['key'], 'value2');
+    });
+
+    test('should return a Map with List', () async {
+      client.responseJson = '''
+        {
+          "key1": "value1",
+          "key2": [{
+            "key": "value1"
+          }, {
+            "key": "value2"
+          }]
+        }
+      ''';
+      final data = await sut.get(url: url);
+      expect(data?['key1'], 'value1');
+      expect(data?['key2'][0]['key'], 'value1');
+      expect(data?['key2'][1]['key'], 'value2');
+    });
+
+    test('should return null on 200 with empty response', () async {
+      client.responseJson = '';
+      final data = await sut.get(url: url);
+      expect(data, isNull);
+    });
+
+    test('should return null on 204', () async {
+      client.simulateNoContent();
+      final data = await sut.get(url: url);
+      expect(data, isNull);
     });
   });
 }
