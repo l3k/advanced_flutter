@@ -1,4 +1,4 @@
-class NextEventPlayer {
+final class NextEventPlayer {
   final String id;
   final String name;
   final String initials;

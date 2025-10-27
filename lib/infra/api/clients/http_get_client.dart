@@ -1,4 +1,4 @@
-abstract class HttpGetClient {
+abstract interface class HttpGetClient {
   Future<dynamic> get({
     required String url,
     Map<String, String>? headers,
