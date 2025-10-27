@@ -1,4 +1,4 @@
-import 'package:advanced_flutter/domain/entites/next_event_player.dart';
+import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 
 class NextEvent {
   final String groupName;

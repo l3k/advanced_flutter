@@ -1,28 +1,31 @@
 import 'dart:convert';
 
-import 'package:advanced_flutter/domain/entites/domain_error.dart';
+import 'package:advanced_flutter/domain/entities/errors.dart';
 import 'package:advanced_flutter/infra/api/clients/http_get_client.dart';
+import 'package:advanced_flutter/infra/types/json.dart';
 import 'package:dartx/dartx.dart';
 import 'package:http/http.dart';
 
-class HttpAdapter implements HttpGetClient {
+final class HttpAdapter implements HttpGetClient {
   final Client client;
-  HttpAdapter({required this.client});
+
+  const HttpAdapter({required this.client});
 
   @override
   Future<dynamic> get({
     required String url,
-    Map<String, String>? headers,
-    Map<String, String?>? params,
-    Map<String, String>? queryString,
+    Json? headers,
+    Json? params,
+    Json? queryString,
   }) async {
-    final allHeaders = (headers ?? {})
-      ..addAll({
-        'content-type': 'application/json',
-        'accept': 'application/json',
-      });
-    final uri = _buildUri(url: url, params: params, queryString: queryString);
-    final response = await client.get(uri, headers: allHeaders);
+    final response = await client.get(
+      _buildUri(url: url, params: params, queryString: queryString),
+      headers: _buildHeaders(url: url, headers: headers),
+    );
+    return _handleResponse(response);
+  }
+
+  dynamic _handleResponse(Response response) {
     switch (response.statusCode) {
       case 200:
         {
@@ -32,22 +35,29 @@ class HttpAdapter implements HttpGetClient {
       case 204:
         return null;
       case 401:
-        throw DomainError.sessionExpired;
+        throw SessionExpiredError();
       default:
-        throw DomainError.unexpected;
+        throw UnexpectedError();
     }
   }
 
-  Uri _buildUri({
-    required String url,
-    Map<String, String?>? params,
-    Map<String, String>? queryString,
-  }) {
+  Map<String, String> _buildHeaders({required String url, Json? headers}) {
+    final defaultHeaders = {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+    };
+    return defaultHeaders..addAll({
+      for (final key in (headers ?? {}).keys) key: headers![key].toString(),
+    });
+  }
+
+  Uri _buildUri({required String url, Json? params, Json? queryString}) {
     url =
         params?.keys
             .fold(
               url,
-              (result, key) => result.replaceFirst(':$key', params[key] ?? ''),
+              (result, key) =>
+                  result.replaceFirst(':$key', params[key]?.toString() ?? ''),
             )
             .removeSuffix('/') ??
         url;
