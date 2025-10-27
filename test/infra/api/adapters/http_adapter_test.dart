@@ -45,18 +45,23 @@ void main() {
         headers: {
           'custom-header1': 'custom-value1',
           'custom-header2': 'custom-value2',
+          'custom-header3': 123,
         },
       );
       expect(client.headers?['content-type'], 'application/json');
       expect(client.headers?['accept'], 'application/json');
       expect(client.headers?['custom-header1'], 'custom-value1');
       expect(client.headers?['custom-header2'], 'custom-value2');
+      expect(client.headers?['custom-header3'], '123');
     });
 
     test('should request with correct params', () async {
-      url = 'http://anyurl.com/:param1/:param2';
-      await sut.get(url: url, params: {'param1': 'value1', 'param2': 'value2'});
-      expect(client.url, 'http://anyurl.com/value1/value2');
+      url = 'http://anyurl.com/:param1/:param2/:param3';
+      await sut.get(
+        url: url,
+        params: {'param1': 'value1', 'param2': 'value2', 'param3': 123},
+      );
+      expect(client.url, 'http://anyurl.com/value1/value2/123');
     });
 
     test('should request with optional param', () async {
