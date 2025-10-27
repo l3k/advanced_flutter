@@ -58,6 +58,10 @@ final class NextEventPresenterSpy implements NextEventPresenter {
     nextEventSubject.add('');
   }
 
+  void emitError() {
+    nextEventSubject.addError(Error());
+  }
+
   @override
   void loadNextEvent({required String groupId}) {
     loadCallCount++;
@@ -93,6 +97,14 @@ void main() {
     await tester.pumpWidget(sut);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     presenter.emitNextEvent();
+    await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets("should hide spinner on load error", (tester) async {
+    await tester.pumpWidget(sut);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    presenter.emitError();
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
