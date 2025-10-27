@@ -21,6 +21,7 @@ void main() {
     url = anyString();
     sut = HttpAdapter(client: client);
   });
+
   group('get', () {
     test('should request with correct method', () async {
       await sut.get(url: url);
@@ -42,59 +43,46 @@ void main() {
     test('should append headers', () async {
       await sut.get(
         url: url,
-        headers: {
-          'custom-header1': 'custom-value1',
-          'custom-header2': 'custom-value2',
-          'custom-header3': 123,
-        },
+        headers: {'h1': 'value1', 'h2': 'value2', 'h3': 123},
       );
       expect(client.headers?['content-type'], 'application/json');
       expect(client.headers?['accept'], 'application/json');
-      expect(client.headers?['custom-header1'], 'custom-value1');
-      expect(client.headers?['custom-header2'], 'custom-value2');
-      expect(client.headers?['custom-header3'], '123');
+      expect(client.headers?['h1'], 'value1');
+      expect(client.headers?['h2'], 'value2');
+      expect(client.headers?['h3'], '123');
     });
 
     test('should request with correct params', () async {
-      url = 'http://anyurl.com/:param1/:param2/:param3';
-      await sut.get(
-        url: url,
-        params: {'param1': 'value1', 'param2': 'value2', 'param3': 123},
-      );
-      expect(client.url, 'http://anyurl.com/value1/value2/123');
+      url = 'http://anyurl.com/:p1/:p2/:p3';
+      await sut.get(url: url, params: {'p1': 'v1', 'p2': 'v2', 'p3': 123});
+      expect(client.url, 'http://anyurl.com/v1/v2/123');
     });
 
     test('should request with optional param', () async {
-      url = 'http://anyurl.com/:param1/:param2';
-      await sut.get(url: url, params: {'param1': 'value1', 'param2': null});
-      expect(client.url, 'http://anyurl.com/value1');
+      url = 'http://anyurl.com/:p1/:p2';
+      await sut.get(url: url, params: {'p1': 'v1', 'p2': null});
+      expect(client.url, 'http://anyurl.com/v1');
     });
 
-    test('should request with invalid param', () async {
-      url = 'http://anyurl.com/:param1/:param2';
-      await sut.get(url: url, params: {'param3': 'value3'});
-      expect(client.url, 'http://anyurl.com/:param1/:param2');
+    test('should request with invalid params', () async {
+      url = 'http://anyurl.com/:p1/:p2';
+      await sut.get(url: url, params: {'p3': 'v3'});
+      expect(client.url, 'http://anyurl.com/:p1/:p2');
     });
 
     test('should request with correct queryStrings', () async {
-      await sut.get(
-        url: url,
-        queryString: {'query1': 'value1', 'query2': 'value2'},
-      );
-      expect(client.url, '$url?query1=value1&query2=value2');
+      await sut.get(url: url, queryString: {'q1': 'v1', 'q2': 'v2', 'q3': 123});
+      expect(client.url, '$url?q1=v1&q2=v2&q3=123');
     });
 
     test('should request with correct queryStrings and params', () async {
-      url = 'http://anyurl.com/:param3/:param4';
+      url = 'http://anyurl.com/:p3/:p4';
       await sut.get(
         url: url,
-        queryString: {'query1': 'value1', 'query2': 'value2'},
-        params: {'param3': 'value3', 'param4': 'value4'},
+        queryString: {'q1': 'v1', 'q2': 'v2'},
+        params: {'p3': 'v3', 'p4': 'v4'},
       );
-      expect(
-        client.url,
-        'http://anyurl.com/value3/value4?query1=value1&query2=value2',
-      );
+      expect(client.url, 'http://anyurl.com/v3/v4?q1=v1&q2=v2');
     });
 
     test('should throw UnexpectedError on 400', () async {
