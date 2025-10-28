@@ -58,23 +58,28 @@ class _NextEventPageState extends State<NextEventPage> {
           }
           if (snapshot.hasError) return buildErrorLayout();
           final viewData = snapshot.data;
-          return ListView(
-            children: [
-              if (viewData!.goalkeepers.isNotEmpty)
-                ListSection(
-                  title: 'DENTRO - GOLEIROS',
-                  items: viewData.goalkeepers,
-                ),
-              if (viewData.players.isNotEmpty)
-                ListSection(
-                  title: 'DENTRO - JOGADORES',
-                  items: viewData.players,
-                ),
-              if (viewData.out.isNotEmpty)
-                ListSection(title: 'FORA', items: viewData.out),
-              if (viewData.doubt.isNotEmpty)
-                ListSection(title: 'DÚVIDA', items: viewData.doubt),
-            ],
+          return RefreshIndicator(
+            onRefresh: () async {
+              widget.presenter.reloadNextEvent(groupId: widget.groupId);
+            },
+            child: ListView(
+              children: [
+                if (viewData!.goalkeepers.isNotEmpty)
+                  ListSection(
+                    title: 'DENTRO - GOLEIROS',
+                    items: viewData.goalkeepers,
+                  ),
+                if (viewData.players.isNotEmpty)
+                  ListSection(
+                    title: 'DENTRO - JOGADORES',
+                    items: viewData.players,
+                  ),
+                if (viewData.out.isNotEmpty)
+                  ListSection(title: 'FORA', items: viewData.out),
+                if (viewData.doubt.isNotEmpty)
+                  ListSection(title: 'DÚVIDA', items: viewData.doubt),
+              ],
+            ),
           );
         },
       ),
