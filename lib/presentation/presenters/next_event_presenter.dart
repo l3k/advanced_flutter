@@ -19,6 +19,7 @@ final class NextEventViewModel {
 
 final class NextEventPlayerViewModel {
   final String name;
+  final String? position;
 
-  const NextEventPlayerViewModel({required this.name});
+  const NextEventPlayerViewModel({required this.name, this.position});
 }
