@@ -25,6 +25,13 @@ class _NextEventPageState extends State<NextEventPage> {
     super.initState();
   }
 
+  Widget buildErrorLayout() => Column(
+    children: [
+      const Text('Algo errado aconteceu, tente novamente.'),
+      ElevatedButton(onPressed: () {}, child: const Text('Recarregar')),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +41,7 @@ class _NextEventPageState extends State<NextEventPage> {
           if (snapshot.connectionState != ConnectionState.active) {
             return const CircularProgressIndicator();
           }
-          if (snapshot.hasError) return const SizedBox();
+          if (snapshot.hasError) return buildErrorLayout();
           final viewData = snapshot.data;
           return ListView(
             children: [
