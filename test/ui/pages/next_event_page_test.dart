@@ -205,5 +205,6 @@ void main() {
     presenter.emitNextEvent();
     await tester.pump();
     expect(find.text('DENTRO - GOLEIROS'), findsNothing);
+    expect(find.text('DENTRO - JOGADORES'), findsNothing);
   });
 }
