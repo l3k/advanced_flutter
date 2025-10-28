@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class PlayerStatus extends StatelessWidget {
-  final bool isConfirmed;
+  final bool? isConfirmed;
 
-  const PlayerStatus({required this.isConfirmed, super.key});
+  const PlayerStatus({this.isConfirmed, super.key});
 
-  Color getColor() => isConfirmed ? Colors.teal : Colors.red;
+  Color getColor() => switch (isConfirmed) {
+    true => Colors.teal,
+    false => Colors.red,
+    null => Colors.grey,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -35,5 +39,13 @@ void main() {
         tester.firstWidget<Container>(find.byType(Container)).decoration
             as BoxDecoration;
     expect(decoration.color, Colors.red);
+  });
+
+  testWidgets('should present grey status', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: PlayerStatus(isConfirmed: null)));
+    final decoration =
+        tester.firstWidget<Container>(find.byType(Container)).decoration
+            as BoxDecoration;
+    expect(decoration.color, Colors.grey);
   });
 }
