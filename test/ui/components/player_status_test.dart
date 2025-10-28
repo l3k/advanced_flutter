@@ -1,26 +1,6 @@
+import 'package:advanced_flutter/ui/components/player_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-class PlayerStatus extends StatelessWidget {
-  final bool? isConfirmed;
-
-  const PlayerStatus({this.isConfirmed, super.key});
-
-  Color getColor() => switch (isConfirmed) {
-    true => Colors.teal,
-    false => Colors.red,
-    null => Colors.grey,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 16,
-      height: 16,
-      decoration: BoxDecoration(color: getColor(), shape: BoxShape.circle),
-    );
-  }
-}
 
 void main() {
   testWidgets('should present green status', (tester) async {
