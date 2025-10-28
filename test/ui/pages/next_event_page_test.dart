@@ -10,7 +10,8 @@ import 'package:rxdart/rxdart.dart';
 import '../../helpers/fakes.dart';
 
 final class NextEventPresenterSpy implements NextEventPresenter {
-  int loadCallCount = 0;
+  int loadCallsCount = 0;
+  int reloadCallsCount = 0;
   String? groupId;
   var nextEventSubject = BehaviorSubject<NextEventViewModel>();
 
@@ -43,7 +44,13 @@ final class NextEventPresenterSpy implements NextEventPresenter {
 
   @override
   void loadNextEvent({required String groupId}) {
-    loadCallCount++;
+    loadCallsCount++;
+    this.groupId = groupId;
+  }
+
+  @override
+  void reloadNextEvent({required String groupId}) {
+    reloadCallsCount++;
     this.groupId = groupId;
   }
 }
@@ -63,7 +70,7 @@ void main() {
 
   testWidgets("should load event data on page init", (tester) async {
     await tester.pumpWidget(sut);
-    expect(presenter.loadCallCount, 1);
+    expect(presenter.loadCallsCount, 1);
     expect(presenter.groupId, groupId);
   });
 
@@ -197,5 +204,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Recarregar'), findsOneWidget);
+  });
+
+  testWidgets('should load event data on reload click', (tester) async {
+    await tester.pumpWidget(sut);
+    presenter.emitError();
+    await tester.pump();
+    await tester.tap(find.text('Recarregar'));
+    expect(presenter.reloadCallsCount, 1);
+    expect(presenter.groupId, groupId);
   });
 }

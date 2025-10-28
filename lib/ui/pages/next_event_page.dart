@@ -28,7 +28,12 @@ class _NextEventPageState extends State<NextEventPage> {
   Widget buildErrorLayout() => Column(
     children: [
       const Text('Algo errado aconteceu, tente novamente.'),
-      ElevatedButton(onPressed: () {}, child: const Text('Recarregar')),
+      ElevatedButton(
+        onPressed: () {
+          widget.presenter.reloadNextEvent(groupId: widget.groupId);
+        },
+        child: const Text('Recarregar'),
+      ),
     ],
   );
 
