@@ -7,10 +7,12 @@ import '../../helpers/fakes.dart';
 final class NextEventViewModel {
   final List<NextEventPlayerViewModel> goalkeepers;
   final List<NextEventPlayerViewModel> players;
+  final List<NextEventPlayerViewModel> out;
 
   const NextEventViewModel({
     this.goalkeepers = const [],
     this.players = const [],
+    this.out = const [],
   });
 }
 
@@ -64,6 +66,8 @@ class _NextEventPageState extends State<NextEventPage> {
                   title: 'DENTRO - JOGADORES',
                   items: viewData.players,
                 ),
+              if (viewData.out.isNotEmpty)
+                ListSection(title: 'FORA', items: viewData.out),
             ],
           );
         },
@@ -109,9 +113,10 @@ final class NextEventPresenterSpy implements NextEventPresenter {
   void emitNextEventWith({
     List<NextEventPlayerViewModel> goalkeepers = const [],
     List<NextEventPlayerViewModel> players = const [],
+    List<NextEventPlayerViewModel> out = const [],
   }) {
     nextEventSubject.add(
-      NextEventViewModel(goalkeepers: goalkeepers, players: players),
+      NextEventViewModel(goalkeepers: goalkeepers, players: players, out: out),
     );
   }
 
@@ -200,11 +205,29 @@ void main() {
     expect(find.text('Pedro'), findsOneWidget);
   });
 
+  testWidgets("should present out section", (tester) async {
+    await tester.pumpWidget(sut);
+    presenter.emitNextEventWith(
+      out: const [
+        NextEventPlayerViewModel(name: 'Rodrigo'),
+        NextEventPlayerViewModel(name: 'Rafael'),
+        NextEventPlayerViewModel(name: 'Pedro'),
+      ],
+    );
+    await tester.pump();
+    expect(find.text('FORA'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('Rodrigo'), findsOneWidget);
+    expect(find.text('Rafael'), findsOneWidget);
+    expect(find.text('Pedro'), findsOneWidget);
+  });
+
   testWidgets("should hide all sections", (tester) async {
     await tester.pumpWidget(sut);
     presenter.emitNextEvent();
     await tester.pump();
     expect(find.text('DENTRO - GOLEIROS'), findsNothing);
     expect(find.text('DENTRO - JOGADORES'), findsNothing);
+    expect(find.text('FORA'), findsNothing);
   });
 }
