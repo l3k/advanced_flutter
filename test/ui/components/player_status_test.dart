@@ -6,12 +6,14 @@ class PlayerStatus extends StatelessWidget {
 
   const PlayerStatus({required this.isConfirmed, super.key});
 
+  Color getColor() => isConfirmed ? Colors.teal : Colors.red;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 16,
       height: 16,
-      decoration: BoxDecoration(color: Colors.teal, shape: BoxShape.circle),
+      decoration: BoxDecoration(color: getColor(), shape: BoxShape.circle),
     );
   }
 }
@@ -23,5 +25,15 @@ void main() {
         tester.firstWidget<Container>(find.byType(Container)).decoration
             as BoxDecoration;
     expect(decoration.color, Colors.teal);
+  });
+
+  testWidgets('should present red status', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(home: PlayerStatus(isConfirmed: false)),
+    );
+    final decoration =
+        tester.firstWidget<Container>(find.byType(Container)).decoration
+            as BoxDecoration;
+    expect(decoration.color, Colors.red);
   });
 }
