@@ -24,11 +24,11 @@ final class NextEventRxPresenter {
     bool isReload = false,
   }) async {
     try {
-      isBusySubject.add(true);
+      if (isReload) isBusySubject.add(true);
       await nextEventLoader(groupId: groupId);
     } catch (error) {
       nextEventSubject.addError(error);
-      isBusySubject.add(false);
+      if (isReload) isBusySubject.add(false);
     }
   }
 }
