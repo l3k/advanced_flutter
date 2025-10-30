@@ -4,13 +4,14 @@ library;
 import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 import 'package:advanced_flutter/presentation/presenters/next_event_presenter.dart';
+import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../helpers/fakes.dart';
 
 final class NextEventRxPresenter {
-  final Future<void> Function({required String groupId}) nextEventLoader;
+  final Future<NextEvent> Function({required String groupId}) nextEventLoader;
   final nextEventSubject = BehaviorSubject<NextEventViewModel>();
   final isBusySubject = BehaviorSubject<bool>();
 
@@ -25,14 +26,25 @@ final class NextEventRxPresenter {
   }) async {
     try {
       if (isReload) isBusySubject.add(true);
-      await nextEventLoader(groupId: groupId);
-      nextEventSubject.add(const NextEventViewModel());
+      final event = await nextEventLoader(groupId: groupId);
+      nextEventSubject.add(_mapEvent(event));
     } catch (error) {
       nextEventSubject.addError(error);
     } finally {
       if (isReload) isBusySubject.add(false);
     }
   }
+
+  NextEventViewModel _mapEvent(NextEvent event) => NextEventViewModel(
+    doubt: event.players
+        .where((player) => player.confirmationDate == null)
+        .sortedBy((player) => player.name)
+        .map(_mapPlayer)
+        .toList(),
+  );
+
+  NextEventPlayerViewModel _mapPlayer(NextEventPlayer player) =>
+      NextEventPlayerViewModel(name: player.name, initials: player.initials);
 }
 
 final class NextEventLoaderSpy {
@@ -99,6 +111,27 @@ void main() {
   test('should emit correct events on load with success', () async {
     sut.isBusyStream.listen(neverCalled);
     expectLater(sut.nextEventStream, emits(isA<NextEventViewModel>()));
+    await sut.loadNextEvent(groupId: groupId);
+  });
+
+  test('should build doubt list sorted by name', () async {
+    nextEventLoader.simulatePlayers([
+      NextEventPlayer(id: anyString(), name: 'C', isConfirmed: anyBool()),
+      NextEventPlayer(id: anyString(), name: 'A', isConfirmed: anyBool()),
+      NextEventPlayer(
+        id: anyString(),
+        name: 'B',
+        isConfirmed: anyBool(),
+        confirmationDate: anyDate(),
+      ),
+      NextEventPlayer(id: anyString(), name: 'D', isConfirmed: anyBool()),
+    ]);
+    sut.nextEventStream.listen((event) {
+      expect(event.doubt.length, 3);
+      expect(event.doubt[0].name, 'A');
+      expect(event.doubt[1].name, 'C');
+      expect(event.doubt[2].name, 'D');
+    });
     await sut.loadNextEvent(groupId: groupId);
   });
 }
