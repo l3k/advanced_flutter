@@ -280,4 +280,24 @@ void main() {
     });
     await sut.loadNextEvent(groupId: groupId);
   });
+
+  test('should map goalkeeper', () async {
+    final player = NextEventPlayer(
+      id: anyString(),
+      name: anyString(),
+      isConfirmed: true,
+      photo: anyString(),
+      position: 'goalkeeper',
+      confirmationDate: anyDate(),
+    );
+    nextEventLoader.simulatePlayers([player]);
+    sut.nextEventStream.listen((event) {
+      expect(event.goalkeepers[0].name, player.name);
+      expect(event.goalkeepers[0].initials, player.initials);
+      expect(event.goalkeepers[0].isConfirmed, player.isConfirmed);
+      expect(event.goalkeepers[0].photo, player.photo);
+      expect(event.goalkeepers[0].position, player.position);
+    });
+    await sut.loadNextEvent(groupId: groupId);
+  });
 }
