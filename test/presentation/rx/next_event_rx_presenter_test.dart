@@ -38,40 +38,30 @@ final class NextEventRxPresenter implements NextEventPresenter {
     }
   }
 
+  Iterable<NextEventPlayer> _doubt(List<NextEventPlayer> players) =>
+      players.where((player) => player.confirmationDate == null);
+  Iterable<NextEventPlayer> _confirmed(List<NextEventPlayer> players) =>
+      players.where((player) => player.confirmationDate != null);
+  Iterable<NextEventPlayer> _in(List<NextEventPlayer> players) =>
+      _confirmed(players).where((player) => player.isConfirmed);
+  Iterable<NextEventPlayer> _out(List<NextEventPlayer> players) =>
+      _confirmed(players).where((player) => !player.isConfirmed);
+  Iterable<NextEventPlayer> _goalkeepers(List<NextEventPlayer> players) =>
+      _in(players).where((player) => player.position == 'goalkeeper');
+  Iterable<NextEventPlayer> _players(List<NextEventPlayer> players) =>
+      _in(players).where((player) => player.position != 'goalkeeper');
+  Comparable _sortByDate(NextEventPlayer player) => player.confirmationDate!;
+  Comparable _sortByName(NextEventPlayer player) => player.name;
+
   NextEventViewModel _mapEvent(NextEvent event) => NextEventViewModel(
-    doubt: event.players
-        .where((player) => player.confirmationDate == null)
-        .sortedBy((player) => player.name)
-        .map(_mapPlayer)
-        .toList(),
-    out: event.players
-        .where(
-          (player) => player.confirmationDate != null && !player.isConfirmed,
-        )
-        .sortedBy((player) => player.confirmationDate!)
-        .map(_mapPlayer)
-        .toList(),
-    goalkeepers: event.players
-        .where(
-          (player) =>
-              player.confirmationDate != null &&
-              player.isConfirmed &&
-              player.position == 'goalkeeper',
-        )
-        .sortedBy((player) => player.confirmationDate!)
-        .map(_mapPlayer)
-        .toList(),
-    players: event.players
-        .where(
-          (player) =>
-              player.confirmationDate != null &&
-              player.isConfirmed &&
-              player.position != 'goalkeeper',
-        )
-        .sortedBy((player) => player.confirmationDate!)
-        .map(_mapPlayer)
-        .toList(),
+    doubt: _mapPlayers(_doubt(event.players).sortedBy(_sortByName)),
+    out: _mapPlayers(_out(event.players).sortedBy(_sortByDate)),
+    goalkeepers: _mapPlayers(_goalkeepers(event.players).sortedBy(_sortByDate)),
+    players: _mapPlayers(_players(event.players).sortedBy(_sortByDate)),
   );
+
+  List<NextEventPlayerViewModel> _mapPlayers(List<NextEventPlayer> players) =>
+      players.map(_mapPlayer).toList();
 
   NextEventPlayerViewModel _mapPlayer(NextEventPlayer player) =>
       NextEventPlayerViewModel(
