@@ -2,8 +2,8 @@ import 'package:advanced_flutter/domain/entities/errors.dart';
 import 'package:advanced_flutter/infra/api/adapters/http_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../helpers/fakes.dart';
-import '../clients/client_spy.dart';
+import '../../../mocks/fakes.dart';
+import '../mocks/client_spy.dart';
 
 void main() {
   late ClientSpy client;
