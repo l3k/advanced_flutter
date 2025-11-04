@@ -7,7 +7,8 @@
     {
       "name": "advanced_flutter",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "program": "lib/main/main.dart"
     },
     {
       "name": "advanced_flutter (profile mode)",
