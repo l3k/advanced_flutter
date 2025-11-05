@@ -10,11 +10,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: Colors.teal,
+      brightness: Brightness.dark,
+    );
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      debugShowCheckedModeBanner: false,
+      darkTheme: ThemeData(
+        dividerTheme: const DividerThemeData(space: 0),
+        appBarTheme: AppBarTheme(backgroundColor: colorScheme.primaryContainer),
+        brightness: Brightness.dark,
+        colorScheme: colorScheme,
+        useMaterial3: true,
       ),
+      themeMode: ThemeMode.dark,
       home: makeNextEventPage(),
     );
   }

@@ -37,6 +37,7 @@ dependencies:
   dartx: 1.2.0
   http: 1.2.1
   rxdart: 0.28.0
+  awesome_flutter_extensions: ^2.0.1
 
 dev_dependencies:
   flutter_test:

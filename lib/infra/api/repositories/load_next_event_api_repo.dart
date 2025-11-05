@@ -12,6 +12,7 @@ final class LoadNextEventApiRepository {
   });
 
   Future<NextEvent> loadNextEvent({required String groupId}) async {
+    await Future.delayed(const Duration(seconds: 2));
     final json = await httpClient.get(url: url, params: {'groupId': groupId});
     return NextEventMapper().toObject(json);
   }
